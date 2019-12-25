@@ -676,7 +676,7 @@ module.exports = File = (function() {
       length = null;
     }
     length || (length = this.readInt());
-    return iconv.decode(new Buffer(this.read(length * 2)), 'utf-16be').replace(/\u0000/g, "");
+    return iconv.decode(new Buffer.from(this.read(length * 2)), 'utf-16be').replace(/\u0000/g, "");
   };
 
   File.prototype.readByte = function() {
@@ -3752,8 +3752,8 @@ function kMaxLength () {
 function Buffer (arg) {
   if (!(this instanceof Buffer)) {
     // Avoid going through an ArgumentsAdaptorTrampoline in the common case.
-    if (arguments.length > 1) return new Buffer(arg, arguments[1])
-    return new Buffer(arg)
+    if (arguments.length > 1) return new Buffer.from(arg, arguments[1])
+    return new Buffer.from(arg)
   }
 
   if (!Buffer.TYPED_ARRAY_SUPPORT) {
@@ -3926,7 +3926,7 @@ function checked (length) {
 function SlowBuffer (subject, encoding) {
   if (!(this instanceof SlowBuffer)) return new SlowBuffer(subject, encoding)
 
-  var buf = new Buffer(subject, encoding)
+  var buf = new Buffer.from(subject, encoding)
   delete buf.parent
   return buf
 }
@@ -3986,7 +3986,7 @@ Buffer.concat = function concat (list, length) {
   if (!isArray(list)) throw new TypeError('list argument must be an Array of Buffers.')
 
   if (list.length === 0) {
-    return new Buffer(0)
+    return new Buffer.from(0)
   }
 
   var i
@@ -3997,7 +3997,7 @@ Buffer.concat = function concat (list, length) {
     }
   }
 
-  var buf = new Buffer(length)
+  var buf = new Buffer.from(length)
   var pos = 0
   for (i = 0; i < list.length; i++) {
     var item = list[i]
@@ -4467,7 +4467,7 @@ Buffer.prototype.slice = function slice (start, end) {
     newBuf = Buffer._augment(this.subarray(start, end))
   } else {
     var sliceLen = end - start
-    newBuf = new Buffer(sliceLen, undefined)
+    newBuf = new Buffer.from(sliceLen, undefined)
     for (var i = 0; i < sliceLen; i++) {
       newBuf[i] = this[i + start]
     }
@@ -4988,7 +4988,7 @@ Buffer.prototype.fill = function fill (value, start, end) {
 Buffer.prototype.toArrayBuffer = function toArrayBuffer () {
   if (typeof Uint8Array !== 'undefined') {
     if (Buffer.TYPED_ARRAY_SUPPORT) {
-      return (new Buffer(this)).buffer
+      return (new Buffer.from(this)).buffer
     } else {
       var buf = new Uint8Array(this.length)
       for (var i = 0, len = buf.length; i < len; i += 1) {
@@ -5831,7 +5831,7 @@ Readable.prototype.push = function(chunk, encoding) {
   if (util.isString(chunk) && !state.objectMode) {
     encoding = encoding || state.defaultEncoding;
     if (encoding !== state.encoding) {
-      chunk = new Buffer(chunk, encoding);
+      chunk = new Buffer.from(chunk, encoding);
       encoding = '';
     }
   }
@@ -6568,7 +6568,7 @@ function fromList(n, state) {
       if (stringMode)
         ret = '';
       else
-        ret = new Buffer(n);
+        ret = new Buffer.from(n);
 
       var c = 0;
       for (var i = 0, l = list.length; i < l && c < n; i++) {
@@ -7082,7 +7082,7 @@ function decodeChunk(state, chunk, encoding) {
   if (!state.objectMode &&
       state.decodeStrings !== false &&
       util.isString(chunk)) {
-    chunk = new Buffer(chunk, encoding);
+    chunk = new Buffer.from(chunk, encoding);
   }
   return chunk;
 }
@@ -7545,7 +7545,7 @@ var StringDecoder = exports.StringDecoder = function(encoding) {
 
   // Enough space to store all bytes of a single character. UTF-8 needs 4
   // bytes, but CESU-8 may require up to 6 (3 bytes per surrogate).
-  this.charBuffer = new Buffer(6);
+  this.charBuffer = new Buffer.from(6);
   // Number of bytes received for the current incomplete multi-byte character.
   this.charReceived = 0;
   // Number of bytes expected for the current incomplete multi-byte character.
@@ -8038,7 +8038,7 @@ DBCSCodec.prototype.decoder = function decoderDBCS(options) {
 
         // Decoder state
         nodeIdx: 0,
-        prevBuf: new Buffer(0),
+        prevBuf: new Buffer.from(0),
 
         // Static data
         decodeTables: this.decodeTables,
@@ -8199,7 +8199,7 @@ DBCSCodec.prototype._fillEncodeTable = function(nodeIdx, prefix, skipEncodeChars
 
 
 function encoderDBCSWrite(str) {
-    var newBuf = new Buffer(str.length * (this.gb18030 ? 4 : 3)), 
+    var newBuf = new Buffer.from(str.length * (this.gb18030 ? 4 : 3)), 
         leadSurrogate = this.leadSurrogate,
         seqObj = this.seqObj, nextChar = -1,
         i = 0, j = 0;
@@ -8322,7 +8322,7 @@ function encoderDBCSEnd() {
     if (this.leadSurrogate === -1 && this.seqObj === undefined)
         return; // All clean. Most often case.
 
-    var newBuf = new Buffer(10), j = 0;
+    var newBuf = new Buffer.from(10), j = 0;
 
     if (this.seqObj) { // We're in the sequence.
         var dbcsCode = this.seqObj[DEF_CHAR];
@@ -8354,7 +8354,7 @@ function encoderDBCSEnd() {
 
 
 function decoderDBCSWrite(buf) {
-    var newBuf = new Buffer(buf.length*2),
+    var newBuf = new Buffer.from(buf.length*2),
         nodeIdx = this.nodeIdx, 
         prevBuf = this.prevBuf, prevBufOffset = this.prevBuf.length,
         seqStart = -this.prevBuf.length, // idx of the start of current parsed sequence.
@@ -8431,7 +8431,7 @@ function decoderDBCSEnd() {
         var buf = this.prevBuf.slice(1);
 
         // Parse remaining as usual.
-        this.prevBuf = new Buffer(0);
+        this.prevBuf = new Buffer.from(0);
         this.nodeIdx = 0;
         if (buf.length > 0)
             ret += decoderDBCSWrite.call(this, buf);
@@ -8657,7 +8657,7 @@ for (var i = 0; i < modules.length; i++) {
 
 // Export Node.js internal encodings.
 
-var utf16lebom = new Buffer([0xFF, 0xFE]);
+var utf16lebom = new Buffer.from([0xFF, 0xFE]);
 
 module.exports = {
     // Encodings
@@ -8707,7 +8707,7 @@ function encoderInternal() {
 }
 
 function encodeInternal(str) {
-    return new Buffer(str, this.enc);
+    return new Buffer.from(str, this.enc);
 }
 
 
@@ -8728,11 +8728,11 @@ function encodeBase64Write(str) {
     this.prevStr = str.slice(completeQuads);
     str = str.slice(0, completeQuads);
 
-    return new Buffer(str, "base64");
+    return new Buffer.from(str, "base64");
 }
 
 function encodeBase64End() {
-    return new Buffer(this.prevStr, "base64");
+    return new Buffer.from(this.prevStr, "base64");
 }
 
 
@@ -8758,10 +8758,10 @@ exports._sbcs = function(options) {
         options.chars = asciiString + options.chars;
     }
 
-    var decodeBuf = new Buffer(options.chars, 'ucs2');
+    var decodeBuf = new Buffer.from(options.chars, 'ucs2');
     
     // Encoding buffer.
-    var encodeBuf = new Buffer(65536);
+    var encodeBuf = new Buffer.from(65536);
     encodeBuf.fill(options.iconv.defaultCharSingleByte.charCodeAt(0));
 
     for (var i = 0; i < options.chars.length; i++)
@@ -8786,7 +8786,7 @@ function encoderSBCS(options) {
 }
 
 function encoderSBCSWrite(str) {
-    var buf = new Buffer(str.length);
+    var buf = new Buffer.from(str.length);
     for (var i = 0; i < str.length; i++)
         buf[i] = this.encodeBuf[str.charCodeAt(i)];
     
@@ -8806,7 +8806,7 @@ function decoderSBCS(options) {
 function decoderSBCSWrite(buf) {
     // Strings are immutable in JS -> we use ucs2 buffer to speed up computations.
     var decodeBuf = this.decodeBuf;
-    var newBuf = new Buffer(buf.length*2);
+    var newBuf = new Buffer.from(buf.length*2);
     var idx1 = 0, idx2 = 0;
     for (var i = 0, _len = buf.length; i < _len; i++) {
         idx1 = buf[i]*2; idx2 = i*2;
@@ -10663,7 +10663,7 @@ exports.utf16be = function(options) {
         encoder: utf16beEncoder,
         decoder: utf16beDecoder,
 
-        bom: new Buffer([0xFE, 0xFF]),
+        bom: new Buffer.from([0xFE, 0xFF]),
     };
 };
 
@@ -10678,7 +10678,7 @@ function utf16beEncoder(options) {
 }
 
 function utf16beEncoderWrite(str) {
-    var buf = new Buffer(str, 'ucs2');
+    var buf = new Buffer.from(str, 'ucs2');
     for (var i = 0; i < buf.length; i += 2) {
         var tmp = buf[i]; buf[i] = buf[i+1]; buf[i+1] = tmp;
     }
@@ -10701,7 +10701,7 @@ function utf16beDecoderWrite(buf) {
     if (buf.length == 0)
         return '';
 
-    var buf2 = new Buffer(buf.length + 1),
+    var buf2 = new Buffer.from(buf.length + 1),
         i = 0, j = 0;
 
     if (this.overflowByte !== -1) {
@@ -10895,7 +10895,7 @@ var nonDirectChars = /[^A-Za-z0-9'\(\),-\.\/:\? \n\r\t]+/g;
 function utf7EncoderWrite(str) {
     // Naive implementation.
     // Non-direct chars are encoded as "+<base64>-"; single "+" char is encoded as "+-".
-    return new Buffer(str.replace(nonDirectChars, function(chunk) {
+    return new Buffer.from(str.replace(nonDirectChars, function(chunk) {
         return "+" + (chunk === '+' ? '' : 
             this.iconv.encode(chunk, 'utf16-be').toString('base64').replace(/=+$/, '')) 
             + "-";
@@ -10933,7 +10933,7 @@ function utf7DecoderWrite(buf) {
                     res += "+";
                 } else {
                     var b64str = base64Accum + buf.slice(lastI, i).toString();
-                    res += this.iconv.decode(new Buffer(b64str, 'base64'), "utf16-be");
+                    res += this.iconv.decode(new Buffer.from(b64str, 'base64'), "utf16-be");
                 }
 
                 if (buf[i] != minusChar) // Minus is absorbed after base64.
@@ -10955,7 +10955,7 @@ function utf7DecoderWrite(buf) {
         base64Accum = b64str.slice(canBeDecoded); // The rest will be decoded in future.
         b64str = b64str.slice(0, canBeDecoded);
 
-        res += this.iconv.decode(new Buffer(b64str, 'base64'), "utf16-be");
+        res += this.iconv.decode(new Buffer.from(b64str, 'base64'), "utf16-be");
     }
 
     this.inBase64 = inBase64;
@@ -10967,7 +10967,7 @@ function utf7DecoderWrite(buf) {
 function utf7DecoderEnd() {
     var res = "";
     if (this.inBase64 && this.base64Accum.length > 0)
-        res = this.iconv.decode(new Buffer(this.base64Accum, 'base64'), "utf16-be");
+        res = this.iconv.decode(new Buffer.from(this.base64Accum, 'base64'), "utf16-be");
 
     this.inBase64 = false;
     this.base64Accum = '';
@@ -10996,7 +10996,7 @@ exports.utf7imap = function(options) {
 
                 iconv: options.iconv,
                 inBase64: false,
-                base64Accum: new Buffer(6),
+                base64Accum: new Buffer.from(6),
                 base64AccumIdx: 0,
             };
         },
@@ -11018,7 +11018,7 @@ function utf7ImapEncoderWrite(str) {
     var inBase64 = this.inBase64,
         base64Accum = this.base64Accum,
         base64AccumIdx = this.base64AccumIdx,
-        buf = new Buffer(str.length*5 + 10), bufIdx = 0;
+        buf = new Buffer.from(str.length*5 + 10), bufIdx = 0;
 
     for (var i = 0; i < str.length; i++) {
         var uChar = str.charCodeAt(i);
@@ -11064,7 +11064,7 @@ function utf7ImapEncoderWrite(str) {
 }
 
 function utf7ImapEncoderEnd() {
-    var buf = new Buffer(10), bufIdx = 0;
+    var buf = new Buffer.from(10), bufIdx = 0;
     if (this.inBase64) {
         if (this.base64AccumIdx > 0) {
             bufIdx += buf.write(this.base64Accum.slice(0, this.base64AccumIdx).toString('base64').replace(/\//g, ',').replace(/=+$/, ''), bufIdx);
@@ -11104,7 +11104,7 @@ function utf7ImapDecoderWrite(buf) {
                     res += "&";
                 } else {
                     var b64str = base64Accum + buf.slice(lastI, i).toString().replace(/,/g, '/');
-                    res += this.iconv.decode(new Buffer(b64str, 'base64'), "utf16-be");
+                    res += this.iconv.decode(new Buffer.from(b64str, 'base64'), "utf16-be");
                 }
 
                 if (buf[i] != minusChar) // Minus may be absorbed after base64.
@@ -11126,7 +11126,7 @@ function utf7ImapDecoderWrite(buf) {
         base64Accum = b64str.slice(canBeDecoded); // The rest will be decoded in future.
         b64str = b64str.slice(0, canBeDecoded);
 
-        res += this.iconv.decode(new Buffer(b64str, 'base64'), "utf16-be");
+        res += this.iconv.decode(new Buffer.from(b64str, 'base64'), "utf16-be");
     }
 
     this.inBase64 = inBase64;
@@ -11138,7 +11138,7 @@ function utf7ImapDecoderWrite(buf) {
 function utf7ImapDecoderEnd() {
     var res = "";
     if (this.inBase64 && this.base64Accum.length > 0)
-        res = this.iconv.decode(new Buffer(this.base64Accum, 'base64'), "utf16-be");
+        res = this.iconv.decode(new Buffer.from(this.base64Accum, 'base64'), "utf16-be");
 
     this.inBase64 = false;
     this.base64Accum = '';
@@ -11394,7 +11394,7 @@ iconv.decode = function decode(buf, encoding, options) {
             iconv.skipDecodeWarning = true;
         }
 
-        buf = new Buffer("" + (buf || ""), "binary"); // Ensure buffer.
+        buf = new Buffer.from("" + (buf || ""), "binary"); // Ensure buffer.
     }
 
     var decoder = iconv.getCodec(encoding).decoder(options);
@@ -18988,7 +18988,7 @@ function string(text){
             for (var i=0,l=txt.length;i<l;i++){
                 bf.push(txt.charCodeAt(i));
             }
-            return iconv.decode(new Buffer(bf), 'utf-16');//it`s utf-16 with bom
+            return iconv.decode(new Buffer.from(bf), 'utf-16');//it`s utf-16 with bom
         }
     }
 }

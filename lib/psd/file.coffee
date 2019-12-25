@@ -59,7 +59,7 @@ module.exports = class File
   # Reads a Unicode UTF-16BE encoded string.
   readUnicodeString: (length = null) ->
     length or= @readInt()
-    iconv.decode(new Buffer(@read(length * 2)),'utf-16be').replace /\u0000/g, ""
+    iconv.decode(new Buffer.from(@read(length * 2)),'utf-16be').replace /\u0000/g, ""
 
   # Helper that reads a single byte.
   readByte: -> @read(1)[0]
