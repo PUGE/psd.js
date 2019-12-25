@@ -35,7 +35,6 @@ module.exports = class TextElements extends LayerInfo
     @textData = new Descriptor(@file).parse()
     @textValue = @textData['Txt ']
     @engineData = parseEngineData(@textData.EngineData)
-
     @warpVersion = @file.readShort()
 
     @descriptorVersion = @file.readInt()
@@ -98,6 +97,9 @@ module.exports = class TextElements extends LayerInfo
       else
         leading = 'auto'
       return leading
+  tracking: ->
+    return [] if not @engineData? and not @styles().Tracking?
+    @styles().Tracking
 
   sizes: ->
     return [] if not @engineData? and not @styles().FontSize?
@@ -155,16 +157,17 @@ module.exports = class TextElements extends LayerInfo
 
   export: ->
     value: @textValue
-    font:
+    font: 
       lengthArray: @lengthArray()
       styles: @fontStyles()
       weights: @fontWeights()
       names: @fonts()
       sizes: @sizes()
+      tracking: @tracking()
       colors: @colors()
       alignment: @alignment()
       textDecoration: @textDecoration()
-      leading: @leading()
+      leading: @leading() 
     left: @coords.left
     top: @coords.top
     right: @coords.right
