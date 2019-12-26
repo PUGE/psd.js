@@ -98,7 +98,8 @@ module.exports = class TextElements extends LayerInfo
         leading = 'auto'
       return leading
   tracking: ->
-    return [] if not @engineData? and not @styles().Tracking?
+    lal = @styles()
+    return [] if not @styles().Tracking?
     @styles().Tracking
 
   sizes: ->
